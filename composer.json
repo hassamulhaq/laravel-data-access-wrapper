@@ -18,7 +18,9 @@
     },
     "require-dev": {
         "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
-        "phpunit/phpunit": "^10.5|^11.0"
+        "phpunit/phpunit": "^10.5|^11.0",
+        "pestphp/pest": "^2.0|^3.0",
+        "pestphp/pest-plugin-laravel": "^2.0|^3.0"
     },
     "autoload": {
         "psr-4": {
@@ -38,6 +40,18 @@
             "aliases": {
                 "DataAccessWrapper": "Hassam\\DataAccessWrapper\\Facades\\DataAccessWrapper"
             }
+        }
+    },
+    "suggest": {
+        "ext-mongodb": "Required to use CacheLogger and MongoAbstractDataCollection.",
+        "mongodb/mongodb": "Required to use CacheLogger and MongoAbstractDataCollection."
+    },
+    "scripts": {
+        "test": "vendor/bin/pest"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
         }
     },
     "minimum-stability": "stable",

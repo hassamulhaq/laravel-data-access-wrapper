@@ -11,7 +11,7 @@ class DataAccessWrapperServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('data-access-wrapper')
-            ->hasConfigFile()
+            ->hasConfigFile(['data-access-wrapper', 'cache-versions', 'database'])
             ->hasMigrations();
     }
 
