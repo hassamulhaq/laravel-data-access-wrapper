@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 
 class BaseCache
 {
-    private const CACHE_VERSION = 'prod:2';
+    private const CACHE_VERSION = 'prod:1';
 
     /** @var string[] */
     protected array $tags = [];
