@@ -5,6 +5,7 @@ Three ways to consume `hassam/data-access-wrapper`. Pick by audience:
 | You are | Use |
 |---|---|
 | Solo dev iterating on the package locally | [Path repository](#1-local-path-repository) |
+| **Distributing as zip — no GitHub auth needed** | [**Zip distribution**](#1b-zip-distribution-no-github-auth) |
 | Team / CI installing from GitHub | [VCS repository](#2-vcs-repository-private-github) |
 | Org with Private Packagist or self-hosted Satis | [Private Packagist](#3-private-packagist--satis) |
 
@@ -57,6 +58,98 @@ Composer creates a **symlink** at `vendor/hassam/data-access-wrapper` → the so
 ❌ CI can't use this (path doesn't exist on CI runner).
 
 > **Don't commit the `repositories` block to a shared branch** unless every dev has the same path. For a shared repo, use VCS (next section) and keep the path repo only on your local feature branches, or guard it behind `composer.local.json` (Composer reads it if present and merges).
+
+---
+
+## 1b. Zip distribution (no GitHub auth)
+
+Hand-deliver the package as a zip. Devs extract to a fixed path on their machine. Composer reads from that path — **no GitHub auth, no PAT, no SSH key**.
+
+### Building the zip (package author)
+
+```bash
+cd /var/www/html/laravel-data-access-wrapper
+git archive --format=zip \
+  --prefix=laravel-data-access-wrapper/ \
+  -o ~/laravel-data-access-wrapper-v0.1.0.zip HEAD
+```
+
+`git archive` exports **only tracked files** — no `.git`, `vendor/`, `.idea/`, `node_modules`. Output ~36 KB.
+
+Distribute the zip via Slack, S3, internal share, etc.
+
+### Consuming the zip (every dev)
+
+```bash
+# 1. Extract zip to standard path (matches the path-repo URL in composer.json)
+sudo unzip -d /var/www/html/ ~/Downloads/laravel-data-access-wrapper-v0.1.0.zip
+sudo chown -R $USER:$USER /var/www/html/laravel-data-access-wrapper
+
+# 2. Install in consumer
+cd /var/www/html/rms-backend
+composer install
+```
+
+Consumer's `composer.json` already has:
+
+```json
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../laravel-data-access-wrapper",
+            "options": { "symlink": true }
+        }
+    ],
+    "require": {
+        "hassam/data-access-wrapper": "*"
+    }
+}
+```
+
+Composer symlinks `vendor/hassam/data-access-wrapper` → `/var/www/html/laravel-data-access-wrapper`. Done. No auth.
+
+### Updating
+
+Author rebuilds zip, redistributes:
+
+```bash
+git archive --format=zip --prefix=laravel-data-access-wrapper/ -o ~/laravel-data-access-wrapper-v0.2.0.zip HEAD
+```
+
+Devs replace contents:
+
+```bash
+rm -rf /var/www/html/laravel-data-access-wrapper
+sudo unzip -d /var/www/html/ ~/Downloads/laravel-data-access-wrapper-v0.2.0.zip
+sudo chown -R $USER:$USER /var/www/html/laravel-data-access-wrapper
+
+cd /var/www/html/rms-backend
+composer update hassam/data-access-wrapper
+php artisan config:clear
+```
+
+### Pros / cons
+
+✅ No GitHub access required.
+✅ No tokens, SSH keys, or PATs.
+✅ Works offline once zip distributed.
+✅ Symlink — code changes in the package dir are live.
+❌ Manual rezip + redistribute on every release.
+❌ Path must match exactly across all devs (`/var/www/html/laravel-data-access-wrapper`).
+❌ CI runners need the zip pre-extracted in their image, or fall back to VCS for CI only.
+
+> **Required path for `rms-backend` consumer:** `/var/www/html/laravel-data-access-wrapper` (because consumer references `../laravel-data-access-wrapper` relative to `/var/www/html/rms-backend`). If devs put the package elsewhere, update the path in `composer.json` and re-run `composer update`.
+
+### Onboarding checklist (zip flow)
+
+1. Receive zip from author.
+2. `sudo unzip -d /var/www/html/ <zip>`.
+3. `sudo chown -R $USER:$USER /var/www/html/laravel-data-access-wrapper`.
+4. `cd /var/www/html/rms-backend && composer install`.
+5. `php artisan vendor:publish --provider="Hassam\DataAccessWrapper\DataAccessWrapperServiceProvider"` (one-time).
+6. Confirm `CACHE_STORE=redis` in `.env`.
+7. `php artisan config:clear`.
 
 ---
 
