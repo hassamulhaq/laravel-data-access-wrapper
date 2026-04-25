@@ -11,7 +11,7 @@ use Spatie\Sluggable\SlugOptions;
 
 class Location extends BaseModel
 {
-    use Cacheable, HasSlug, SoftDeletes;
+    use Cacheable, HasFactory, HasSlug, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -110,8 +110,8 @@ class Location extends BaseModel
     {
         return [
             ['id'],
-            'slug'        => ['slug', 'branch_id'],
-            'by_branch'   => ['branch_id'],
+            'slug' => ['slug', 'branch_id'],
+            'by_branch' => ['branch_id'],
         ];
     }
 
@@ -122,7 +122,6 @@ class Location extends BaseModel
             "location:{$this->id}",
             "branch:{$this->branch_id}",
         ];
-
         if ($this->wasChanged('branch_id')) {
             $tags[] = "branch:{$this->getOriginal('branch_id')}";
         }

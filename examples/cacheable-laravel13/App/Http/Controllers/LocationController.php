@@ -16,14 +16,12 @@ class LocationController extends Controller
     {
         $user = $request->user();
 
-        if ($user->isSuperAdmin()) {
-            $locations = $request->filled('branch_id')
-                ? LocationRepository::getByBranch((int) $request->branch_id)
-                : LocationRepository::getAll();
-        } elseif ($user->branch_id) {
-            $locations = LocationRepository::getByBranch((int) $user->branch_id);
+        if (! $user->isSuperAdmin()) {
+            $locations = LocationRepository::getByBranch($user->branch_id);
+        } elseif ($request->filled('branch_id')) {
+            $locations = LocationRepository::getByBranch((int) $request->branch_id);
         } else {
-            $locations = [];
+            $locations = LocationRepository::getAll();
         }
 
         return Inertia::render('locations/index', [
