@@ -9,7 +9,7 @@ Three ways to consume `hassam/data-access-wrapper`. Pick by audience:
 | Team / CI installing from GitHub | [VCS repository](#2-vcs-repository-private-github) |
 | Org with Private Packagist or self-hosted Satis | [Private Packagist](#3-private-packagist--satis) |
 
-The package is at `/var/www/html/laravel-data-access-wrapper`. Remote: `git@github.com:hassamulhaq/laravel-data-access-layer.git` (private).
+The package is at `/var/www/html/laravel-data-access-wrapper`. Remote: `git@github.com:hassamulhaq/laravel-data-access-wrapper.git` (private).
 
 Target project for examples: `/var/www/html/rms-backend` (Laravel 13).
 
@@ -174,7 +174,7 @@ In `rms-backend/composer.json`:
     "repositories": [
         {
             "type": "vcs",
-            "url": "git@github.com:hassamulhaq/laravel-data-access-layer.git"
+            "url": "git@github.com:hassamulhaq/laravel-data-access-wrapper.git"
         }
     ],
     "require": {

@@ -6,7 +6,7 @@ Generate fine-grained PAT (recommended type):
 2. Token name: laravel-data-access-wrapper-read
 3. Resource owner: your account (hassamulhaq)
 4. Expiration: 90 days max — calendar reminder to rotate
-5. Repository access: Only select repositories → pick laravel-data-access-layer
+5. Repository access: Only select repositories → pick laravel-data-access-wrapper
 6. Repository permissions:
 - Contents: Read-only
 - Metadata: Read-only (auto-required)
