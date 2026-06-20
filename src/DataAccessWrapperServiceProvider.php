@@ -2,25 +2,24 @@
 
 namespace Hassam\DataAccessWrapper;
 
-use Spatie\LaravelPackageTools\Package;
-use Spatie\LaravelPackageTools\PackageServiceProvider;
+use Illuminate\Support\ServiceProvider;
 
-class DataAccessWrapperServiceProvider extends PackageServiceProvider
+class DataAccessWrapperServiceProvider extends ServiceProvider
 {
-    public function configurePackage(Package $package): void
+    public function register(): void
     {
-        $package
-            ->name('data-access-wrapper')
-            ->hasConfigFile(['data-access-wrapper', 'cache-versions', 'database'])
-            ->hasMigrations();
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/cache_versions.php',
+            'cache_versions'
+        );
     }
 
-    public function packageRegistered(): void
+    public function boot(): void
     {
-        $this->app->singleton('data-access-wrapper', function ($app) {
-            return new DataAccessWrapper(
-                config('data-access-wrapper', [])
-            );
-        });
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../config/cache_versions.php' => config_path('cache_versions.php'),
+            ], 'cache-versions-config');
+        }
     }
 }

@@ -18,10 +18,6 @@
         <include>
             <directory>src</directory>
         </include>
-        <exclude>
-            <file>src/MongoAbstractDataCollection.php</file>
-            <file>src/CacheLogger.php</file>
-        </exclude>
     </source>
     <php>
         <env name="DB_CONNECTION" value="testing"/>
