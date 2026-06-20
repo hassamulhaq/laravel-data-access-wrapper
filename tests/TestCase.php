@@ -27,16 +27,17 @@ class TestCase extends Orchestra
     {
         $app['config']->set('database.default', 'testing');
         $app['config']->set('database.connections.testing', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
 
-        // Array store supports tags — required for tag tests.
+        // Array store supports tags — required for the tag-based invalidation.
         $app['config']->set('cache.default', 'array');
 
-        $app['config']->set('cache-versions.version', [
-            'orders'      => 'v1',
+        // Flat cache_versions map: key = cacheTag (table name).
+        $app['config']->set('cache_versions', [
+            'orders' => 'v1',
             'order_items' => 'v1',
         ]);
     }
@@ -52,14 +53,6 @@ class TestCase extends Orchestra
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
-        });
-
-        Schema::create('order_items', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('order_id');
-            $table->string('sku');
-            $table->integer('quantity')->default(1);
-            $table->timestamps();
         });
     }
 }

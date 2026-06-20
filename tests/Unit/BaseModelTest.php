@@ -1,6 +1,22 @@
 <?php
 
+use Hassam\DataAccessWrapper\BaseModel;
 use Hassam\DataAccessWrapper\Tests\Fixtures\Order;
+use Illuminate\Support\Facades\DB;
+
+it('defaults cacheBy to the primary key and cacheTag to the table name', function () {
+    $model = new class extends BaseModel
+    {
+        protected $table = 'widgets';
+    };
+
+    expect($model->cacheBy())->toBe(['id']);
+    expect($model->cacheTag())->toBe('widgets');
+});
+
+it('lets a model override cacheBy', function () {
+    expect((new Order)->cacheBy())->toBe(['id']);
+});
 
 it('exposes table name and fillable columns statically', function () {
     expect(Order::getTableName())->toBe('orders');
@@ -13,19 +29,21 @@ it('lists real schema columns', function () {
     expect($columns)->toContain('id', 'customer_id', 'status', 'created_at', 'deleted_at');
 });
 
-it('strips appends before save', function () {
+it('strips appended attributes before save so they are not persisted as columns', function () {
     $order = new Order();
     $order->customer_id = 1;
-    $order->updated_by  = 1;
+    $order->updated_by = 1;
     $order->setAppends(['virtual']);
 
+    // 'virtual' is appended AND set into the attribute bag — without the guard
+    // Eloquent would try to INSERT a non-existent "virtual" column and fail.
     $order->virtual = 'should-not-persist';
     $order->save();
 
-    $fresh = Order::find($order->id);
+    $raw = DB::table('orders')->find($order->id);
 
-    expect($fresh)->not->toBeNull();
-    expect($fresh->getAttribute('virtual'))->toBeNull();
+    expect($raw)->not->toBeNull();
+    expect(property_exists($raw, 'virtual'))->toBeFalse();
 });
 
 it('serializes dates as Y-m-d H:i:s', function () {

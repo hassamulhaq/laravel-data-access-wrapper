@@ -1,9 +1,9 @@
 {
     "name": "hassam/data-access-wrapper",
-    "description": "A Laravel data access wrapper package.",
+    "description": "Scalable entity + ID-list caching layer for Laravel Eloquent models and repositories.",
     "type": "library",
     "license": "MIT",
-    "keywords": ["laravel", "data-access", "wrapper", "repository"],
+    "keywords": ["laravel", "data-access", "wrapper", "repository", "cache", "eloquent"],
     "authors": [
         {
             "name": "hassamulhaq",
@@ -12,9 +12,10 @@
     ],
     "require": {
         "php": "^8.1",
+        "illuminate/cache": "^10.0|^11.0|^12.0|^13.0",
         "illuminate/contracts": "^10.0|^11.0|^12.0|^13.0",
-        "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
-        "spatie/laravel-package-tools": "^1.93"
+        "illuminate/database": "^10.0|^11.0|^12.0|^13.0",
+        "illuminate/support": "^10.0|^11.0|^12.0|^13.0"
     },
     "require-dev": {
         "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
@@ -36,15 +37,8 @@
         "laravel": {
             "providers": [
                 "Hassam\\DataAccessWrapper\\DataAccessWrapperServiceProvider"
-            ],
-            "aliases": {
-                "DataAccessWrapper": "Hassam\\DataAccessWrapper\\Facades\\DataAccessWrapper"
-            }
+            ]
         }
-    },
-    "suggest": {
-        "ext-mongodb": "Required to use CacheLogger and MongoAbstractDataCollection.",
-        "mongodb/mongodb": "Required to use CacheLogger and MongoAbstractDataCollection."
     },
     "scripts": {
         "test": "vendor/bin/pest"
